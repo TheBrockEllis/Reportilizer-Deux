@@ -1,0 +1,21 @@
+{
+  "templates": [
+    {
+      "name": "High School - 9th Grade",
+      "margins": [],
+      "boxes": [
+        {
+          "x": 300,
+          "y": 150,
+          "width": 340,
+          "height": 340,
+          "data": ""
+          ,
+          "style":
+        }
+      ],
+      "dataSource": "",
+      "updated": new Date.
+    }
+  ]
+}

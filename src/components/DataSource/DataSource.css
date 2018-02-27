@@ -1,0 +1,11 @@
+.dataSource {
+  background-color: #eee;
+  padding: 1cm 0;
+}
+
+textarea {
+  width: 21cm;
+  display: block;
+  margin: 0 auto;
+  height: 75vh;
+}
