@@ -3,7 +3,6 @@ import './VisualEditor.css';
 import Box from '../Box/Box';
 
 import { Button, ButtonGroup } from 'reactstrap';
-
 import interact from 'interactjs';
 
 class VisualEditor extends React.Component {
