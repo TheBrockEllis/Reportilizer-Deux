@@ -8,10 +8,11 @@ class Box extends React.Component {
   constructor(props){
     super(props);
 
+    this.confirmDelete = this.confirmDelete.bind(this);
     this.deleteBox = this.deleteBox.bind(this);
   }
 
-  deleteBox(){
+  confirmDelete(){
 
     confirmAlert({
       title: 'Delete box',                        // Title dialog
@@ -19,9 +20,7 @@ class Box extends React.Component {
       confirmLabel: 'Yes',                           // Text button confirm
       cancelLabel: 'No',                             // Text button cancel
       onConfirm: () => {
-        // remove box from the page1
-        alert('Removing box');
-        //tell the VisualEditor, that tracks all of the boxes, to remove this one
+        this.deleteBox();
       },
       onCancel: () => {
         alert('Action after Cancel')     // Action after Cancel
@@ -30,14 +29,18 @@ class Box extends React.Component {
 
   }
 
+  deleteBox(){
+    this.props.deleteBox(this.props.box);
+  }
+
   render(){
     return (
-      <div className='draggable box'>
+      <div className='draggable box' id={`box_${this.props.box.boxIndex}`}>
         <p className='currentLocation'>100 x 100</p>
-        <p className='boxTitle' contentEditable={true}>Box</p>
+        <p className='boxTitle'>{this.props.box.name}</p>
         <div className='boxControls'>
           <span><i className='fas fa-edit' style={{marginRight: '15px'}}></i></span>
-          <span onClick={this.deleteBox}><i className='fas fa-trash'></i></span>
+          <span onClick={this.confirmDelete}><i className='fas fa-trash'></i></span>
         </div>
       </div>
     )

@@ -15,6 +15,7 @@ class VisualEditor extends React.Component {
     };
 
     this.addBox = this.addBox.bind(this);
+    this.deleteBox = this.deleteBox.bind(this);
   }
 
   componentDidMount(){
@@ -123,12 +124,38 @@ class VisualEditor extends React.Component {
 
   addBox(){
     // State change will cause component re-render
-    let box = { boxIndex: this.state.boxIndex, name: "Another Name", x: 0, y: 0, width: 100, height: 100, code: '', style: '' };
+    let box = { boxIndex: this.state.boxIndex, name: `Box #${this.state.boxIndex}`, x: 0, y: 0, width: 100, height: 100, code: '', style: '' };
 
     this.setState({
       boxes: [...this.state.boxes, box],
       boxIndex: this.state.boxIndex + 1
     });
+  }
+
+  deleteBox(box){
+    var targetIndex;
+    for (var i=0; i < this.state.boxes.length; i++) {
+      if (this.state.boxes[i].boxIndex === box.boxIndex) {
+        targetIndex = i;
+      }
+    }
+
+    let box_id = `box_${box.boxIndex}`;
+
+    // remove all interactjs listeners from the element
+    console.log(`Unsetting ${box_id}`);
+    // interact(`#${box_id}`).unset()
+
+    // remove the component from the DOM
+    // let mountNode = ReactDOM.findDOMNode(document.getElementById(box_id));
+    // ReactDOM.unmountComponentAtNode(mountNode);
+
+    // cut the box out of the state and update state
+    let boxes = this.state.boxes;
+    boxes.splice(targetIndex, 1);
+    this.setState({
+      boxes: boxes
+    })
   }
 
   render() {
@@ -146,9 +173,9 @@ class VisualEditor extends React.Component {
           <div className='page' id='page1'>
 
           {
-            this.state.boxes.map( (box, index) => (
-                <Box key={index} name={box.name} />
-            ))
+            this.state.boxes.map( (box, index) => {
+                return <Box key={box.boxIndex} box={box} deleteBox={this.deleteBox} />
+            })
           }
 
           </div>
@@ -159,7 +186,3 @@ class VisualEditor extends React.Component {
 }
 
 export default VisualEditor;
-
-// <Interactive>
-//   <img src='http://fillmurray.com/200/200' />
-// </Interactive>
