@@ -2,7 +2,8 @@ import React from 'react';
 import './VisualEditor.css';
 import Box from '../Box/Box';
 
-import { Button, ButtonGroup } from 'reactstrap';
+import update from 'immutability-helper';
+import { Button, ButtonGroup, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Input, Label } from 'reactstrap';
 import interact from 'interactjs';
 
 class VisualEditor extends React.Component {
@@ -11,11 +12,17 @@ class VisualEditor extends React.Component {
 
     this.state = {
       boxes: [],
-      boxIndex: 0
+      boxIndex: 0,
+      editModal: false,
+      editBox: {}
     };
 
     this.addBox = this.addBox.bind(this);
     this.deleteBox = this.deleteBox.bind(this);
+    this.updateBox = this.updateBox.bind(this);
+    this.toggleEditModal = this.toggleEditModal.bind(this);
+    this.dragUpdateState = this.dragUpdateState.bind(this);
+    this.resizeUpdateState = this.resizeUpdateState.bind(this);
   }
 
   componentDidMount(){
@@ -35,29 +42,14 @@ class VisualEditor extends React.Component {
         targets: [
           interact.createSnapGrid({ x: 10, y: 10 })
         ],
-        range: Infinity,
-        relativePoints: [ { x: 0, y: 0 } ]
+        range: Infinity
       },
       // enable autoScroll
       autoScroll: true,
-
-      // call this function on every dragmove event
-      onmove: this.dragMoveListener,
-      // call this function on every dragend event
-      onend: function (event) {
-        // var textEl = event.target.querySelector('p');
-        //
-        // textEl && (textEl.textContent =
-        //   'moved a distance of '
-        //   + (Math.sqrt(Math.pow(event.pageX - event.x0, 2) +
-        //                Math.pow(event.pageY - event.y0, 2) | 0))
-        //       .toFixed(2) + 'px');
-      }
     })
     .resizable({
       // resize from all edges and corners
       edges: { left: true, right: true, bottom: true, top: true },
-
       // keep the edges inside the parent
       restrictEdges: {
         outer: 'parent',
@@ -74,15 +66,16 @@ class VisualEditor extends React.Component {
         range: Infinity,
         relativePoints: [ { x: 0, y: 0 } ]
       },
-
       // minimum size
-      restrictSize: {
-        min: { width: 50, height: 50 },
-      },
-
+      restrictSize: { min: { width: 50, height: 50 } },
       inertia: true,
     })
-    .on('resizemove', this.resizeMoveListener);
+    .on({
+      resizemove: this.resizeMoveListener,
+      resizeend: this.resizeUpdateState,
+      dragmove: this.dragMoveListener,
+      dragend: this.dragUpdateState
+    });
   }
 
   dragMoveListener(event) {
@@ -99,6 +92,17 @@ class VisualEditor extends React.Component {
     // update the posiion attributes
     target.setAttribute('data-x', x);
     target.setAttribute('data-y', y);
+  }
+
+  dragUpdateState(event) {
+    var target = event.target,
+        // keep the dragged position in the data-x/data-y attributes
+        x = (parseFloat(target.getAttribute('data-x'))),
+        y = (parseFloat(target.getAttribute('data-y'))),
+        boxIndex = target.getAttribute('data-boxindex');
+
+    let newState = update(this.state, {boxes: {[boxIndex]: {x: {$set: x}, y: {$set: y}}}});
+    this.setState(newState);
   }
 
   resizeMoveListener(event){
@@ -122,9 +126,52 @@ class VisualEditor extends React.Component {
     target.firstChild.textContent = Math.round(event.rect.width) + '\u00D7' + Math.round(event.rect.height);
   }
 
+  resizeUpdateState(event){
+    var target = event.target,
+        x = parseFloat(target.getAttribute('data-x')),
+        y = parseFloat(target.getAttribute('data-y')),
+        height = parseInt(target.style.height, 10),
+        width = parseInt(target.style.width, 10),
+        boxIndex = target.getAttribute('data-boxindex');
+
+    let updatedBox = {
+      x: x,
+      y: y,
+      width: width,
+      height: height
+    }
+
+    let newState = update(this.state, {boxes: {[boxIndex]: {$merge: updatedBox}}});
+    this.setState(newState);
+  }
+
+  toggleEditModal(box?) {
+    //if this is true, we need to clear out the editing box
+    let newState;
+    if(this.state.editModal){
+      newState = { editBox: {}, editModal: false }
+    } else {
+      newState = { editBox: box, editModal: true }
+    }
+
+    this.setState(newState);
+
+    //clear out the modal Form
+    // document.getElementById('boxPropertiesForm').reset();
+  }
+
   addBox(){
     // State change will cause component re-render
-    let box = { boxIndex: this.state.boxIndex, name: `Box #${this.state.boxIndex}`, x: 0, y: 0, width: 100, height: 100, code: '', style: '' };
+    let box = {
+      boxIndex: this.state.boxIndex,
+      name: `Box #${this.state.boxIndex}`,
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100,
+      code: '',
+      style: ''
+    };
 
     this.setState({
       boxes: [...this.state.boxes, box],
@@ -132,30 +179,36 @@ class VisualEditor extends React.Component {
     });
   }
 
-  deleteBox(box){
-    var targetIndex;
+  /*
+   * the BoxIndex is essentially what number of box has been created,
+   * but NOT the true array index in state.boxes
+   * this function returns the true array index
+  */
+  findBoxArrayIndex(box){
+    var arrayIndex;
     for (var i=0; i < this.state.boxes.length; i++) {
       if (this.state.boxes[i].boxIndex === box.boxIndex) {
-        targetIndex = i;
+        arrayIndex = i;
+        break;
       }
     }
 
-    let box_id = `box_${box.boxIndex}`;
+    return arrayIndex;
+  }
 
-    // remove all interactjs listeners from the element
-    console.log(`Unsetting ${box_id}`);
-    // interact(`#${box_id}`).unset()
-
-    // remove the component from the DOM
-    // let mountNode = ReactDOM.findDOMNode(document.getElementById(box_id));
-    // ReactDOM.unmountComponentAtNode(mountNode);
-
+  deleteBox(box){
     // cut the box out of the state and update state
+    var arrayIndex = this.findBoxArrayIndex(box);
     let boxes = this.state.boxes;
-    boxes.splice(targetIndex, 1);
+    boxes.splice(arrayIndex, 1);
     this.setState({
       boxes: boxes
     })
+  }
+
+  updateBox(){
+    console.log('Updating box');
+    this.toggleEditModal();
   }
 
   render() {
@@ -174,12 +227,34 @@ class VisualEditor extends React.Component {
 
           {
             this.state.boxes.map( (box, index) => {
-                return <Box key={box.boxIndex} box={box} deleteBox={this.deleteBox} />
+                return <Box
+                  key={box.boxIndex}
+                  box={box}
+                  deleteBox={this.deleteBox}
+                  toggleEditModal={this.toggleEditModal} />
             })
           }
 
           </div>
         </div>
+
+        <Modal isOpen={this.state.editModal} toggle={this.toggleEditModal} className={this.props.className}>
+          <ModalHeader toggle={this.toggleEditModal}>Edit Box {this.state.editBox.name}</ModalHeader>
+          <ModalBody>
+
+            <Form id='boxPropertiesForm'>
+              <FormGroup>
+                <Label for="boxName">Box Name</Label>
+                <Input type="text" name="boxName" id="boxName" placeholder="Grades Block" />
+              </FormGroup>
+            </Form>
+
+          </ModalBody>
+          <ModalFooter>
+            <Button color="primary" onClick={this.updateBox}>Save</Button>{' '}
+            <Button color="secondary" onClick={this.toggleEditModal}>Cancel</Button>
+          </ModalFooter>
+        </Modal>
       </div>
     );
   }
