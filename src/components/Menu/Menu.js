@@ -99,7 +99,7 @@ class Home extends React.Component {
               this.state.templates.map( (template, index) => {
                 return (
                   <tr key={index}>
-                    <td><NavLink to={'report/' + template.name}>{template.name}</NavLink></td>
+                    <td><NavLink to={'report/' + template.name + '/' + index}>{template.name}</NavLink></td>
                     <td>{ new Date(template.updated).toLocaleString() }</td>
                     <td onClick={() => this.deleteTemplate(index)}><i className='fas fa-trash'></i></td>
                   </tr>

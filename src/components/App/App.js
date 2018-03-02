@@ -18,7 +18,7 @@ class App extends React.Component {
         <Router>
           <div className='App-pages'>
             <Route exact path="/" component={Menu} />
-            <Route path='/report/:id' component={Report} />
+            <Route path='/report/:name/:id' component={Report} />
           </div>
         </Router>
       </div>

@@ -5,6 +5,7 @@ import Box from '../Box/Box';
 import update from 'immutability-helper';
 import { Button, ButtonGroup, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Input, Label } from 'reactstrap';
 import interact from 'interactjs';
+import Behave from 'behave-js';
 
 class VisualEditor extends React.Component {
   constructor(props){
@@ -20,12 +21,22 @@ class VisualEditor extends React.Component {
     this.addBox = this.addBox.bind(this);
     this.deleteBox = this.deleteBox.bind(this);
     this.updateBox = this.updateBox.bind(this);
+    this.saveState = this.saveState.bind(this);
     this.toggleEditModal = this.toggleEditModal.bind(this);
     this.dragUpdateState = this.dragUpdateState.bind(this);
     this.resizeUpdateState = this.resizeUpdateState.bind(this);
   }
 
   componentDidMount(){
+
+    //load template data from localStorage
+    let templates = JSON.parse(localStorage.getItem('templates'));
+    if(templates[this.props.templateId]){
+      this.setState({
+        boxes: templates[this.props.templateId].boxes,
+        boxIndex: templates[this.props.templateId].boxes.length
+      });
+    }
 
     interact('.draggable')
     .draggable({
@@ -76,6 +87,14 @@ class VisualEditor extends React.Component {
       dragmove: this.dragMoveListener,
       dragend: this.dragUpdateState
     });
+
+    new Behave({
+      textarea: document.getElementById('boxStyle')
+    });
+
+    new Behave({
+      textarea: document.getElementById('boxContent')
+    })
   }
 
   dragMoveListener(event) {
@@ -155,9 +174,6 @@ class VisualEditor extends React.Component {
     }
 
     this.setState(newState);
-
-    //clear out the modal Form
-    // document.getElementById('boxPropertiesForm').reset();
   }
 
   addBox(){
@@ -196,6 +212,11 @@ class VisualEditor extends React.Component {
     return arrayIndex;
   }
 
+  saveState(){
+    // this tells the <Report /> to save all of the boxes and margins
+    this.props.onSaveState(this.state);
+  }
+
   deleteBox(box){
     // cut the box out of the state and update state
     var arrayIndex = this.findBoxArrayIndex(box);
@@ -208,6 +229,15 @@ class VisualEditor extends React.Component {
 
   updateBox(){
     console.log('Updating box');
+
+    let updatedBox = {
+      name: document.getElementById('boxName').value,
+      code: document.getElementById('boxCode').value,
+      style: document.getElementById('boxStyle').value
+    }
+
+    this.setState( update(this.state, {boxes: {[this.state.editBox.boxIndex]: {$merge: updatedBox}}}));
+
     this.toggleEditModal();
   }
 
@@ -220,6 +250,7 @@ class VisualEditor extends React.Component {
             <Button className='btn btn-sm btn-primary' onClick={this.addBox}>Add Box</Button>
             <Button>Set Margins</Button>
             <Button>Generate PDF</Button>
+            <Button onClick={this.saveState}>Save Template</Button>
           </ButtonGroup>
         </div>
         <div className='document'>
@@ -245,7 +276,13 @@ class VisualEditor extends React.Component {
             <Form id='boxPropertiesForm'>
               <FormGroup>
                 <Label for="boxName">Box Name</Label>
-                <Input type="text" name="boxName" id="boxName" placeholder="Grades Block" />
+                <Input type="text" name="boxName" id="boxName" placeholder="Grades Block" defaultValue={this.state.editBox.name} />
+
+                <Label for="boxCode">Box Content</Label>
+                <textarea name="boxCode" id="boxCode">{this.state.editBox.code}</textarea>
+
+                <Label for="boxStyle">Box Style</Label>
+                <textarea name="boxStyle" id="boxStyle">{this.state.editBox.style}</textarea>
               </FormGroup>
             </Form>
 
