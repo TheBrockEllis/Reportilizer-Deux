@@ -1,5 +1,6 @@
 .alert {
-  position: absolute;
-  top: 75px;
+  position: fixed;
+  bottom: 10px;
   right: 10px;
+  margin-bottom: 0 !important;
 }

@@ -6,6 +6,8 @@ import DataSource from '../DataSource/DataSource';
 
 import { TabContent, TabPane, Nav, NavItem, NavLink, Breadcrumb, BreadcrumbItem, Fade, Alert } from 'reactstrap';
 import classnames from 'classnames';
+import dot from 'dot';
+import juice from 'juice';
 
 class Report extends React.Component {
   constructor(props){
@@ -18,6 +20,7 @@ class Report extends React.Component {
 
     this.toggleTab = this.toggleTab.bind(this);
     this.saveState = this.saveState.bind(this);
+    this.generatePdf = this.generatePdf.bind(this);
   }
 
   toggleTab(tab) {
@@ -29,10 +32,6 @@ class Report extends React.Component {
   }
 
   saveState(state){
-
-    // console.log(this.props.match.params.id);
-    // console.log('saving state in report');
-
     let templates = JSON.parse(localStorage.getItem('templates'));
     let template = templates[this.props.match.params.id];
 
@@ -46,7 +45,60 @@ class Report extends React.Component {
 
     setTimeout(()=> {
       this.setState({updated: false})
-    }, 2000)
+    }, 2000);
+  }
+
+  generatePdf(state){
+    alert('making a PDF');
+
+    // create a 'PDF' div that will be hidden from view and used to take a snapshot
+    let printablePdf = document.createElement('div');
+    printablePdf.id = 'printablePdf';
+    printablePdf.style.width = '216mm';
+    printablePdf.style.height = '279mm';
+    printablePdf.style.fontSize = '3.52778mm';
+    printablePdf.style.margin = 0;
+    printablePdf.style.position = 'relative';
+    document.getElementsByTagName('body')[0].appendChild(printablePdf);
+
+    state.boxes.forEach(box => {
+      let div = document.createElement('div');
+      div.style.position = 'absolute';
+      div.style.left = (box.x / 3.779528)  + 'mm';
+      div.style.top = (box.y / 3.779528) + 'mm';
+      div.style.width = (box.width / 3.779528) + 'mm';
+      div.style.height = (box.height / 3.779528) + 'mm';
+      div.style.border = '1px solid #f1f1f1'; //remove this later
+
+      let templateFunction = dot.template(box.code);
+      let html = templateFunction({}); // DATA SOURCE GOES HERE
+
+      // inline all of the CSS styles we have
+      html = juice.inlineContent(html, box.style, { inlinePseudoElements: true });
+
+      //append that shit to the box
+      div.innerHTML = html;
+
+      // console.log(html);
+      printablePdf.appendChild(div);
+    });
+
+    // send HTTP POST request to server with HTML string to generate a PDF
+    fetch('http://138.197.66.87', {
+    	method: 'POST',
+      body: printablePdf.outerHTML,
+    	mode: 'cors',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'text/plain',
+      }
+    }).then( response => response.json() )
+    .then( response => {
+      console.log(response)
+      window.location.href = `http://138.197.66.87/downloads/${response.filename}`;
+    });
+
+    printablePdf.parentNode.removeChild(printablePdf);
   }
 
   render() {
@@ -85,7 +137,7 @@ class Report extends React.Component {
         </Nav>
         <TabContent activeTab={this.state.activeTab}>
           <TabPane tabId="1">
-            <VisualEditor templateId={this.props.match.params.id} onSaveState={this.saveState} />
+            <VisualEditor templateId={this.props.match.params.id} onSaveState={this.saveState} onGeneratePdf={this.generatePdf}/>
           </TabPane>
           <TabPane tabId="2">
             <DataSource />

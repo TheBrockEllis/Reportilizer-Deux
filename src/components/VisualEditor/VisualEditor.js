@@ -22,6 +22,7 @@ class VisualEditor extends React.Component {
     this.deleteBox = this.deleteBox.bind(this);
     this.updateBox = this.updateBox.bind(this);
     this.saveState = this.saveState.bind(this);
+    this.generatePdf = this.generatePdf.bind(this);
     this.toggleEditModal = this.toggleEditModal.bind(this);
     this.dragUpdateState = this.dragUpdateState.bind(this);
     this.resizeUpdateState = this.resizeUpdateState.bind(this);
@@ -212,11 +213,6 @@ class VisualEditor extends React.Component {
     return arrayIndex;
   }
 
-  saveState(){
-    // this tells the <Report /> to save all of the boxes and margins
-    this.props.onSaveState(this.state);
-  }
-
   deleteBox(box){
     // cut the box out of the state and update state
     var arrayIndex = this.findBoxArrayIndex(box);
@@ -241,6 +237,16 @@ class VisualEditor extends React.Component {
     this.toggleEditModal();
   }
 
+  saveState(){
+    // this tells the <Report /> to save all of the boxes and margins
+    this.props.onSaveState(this.state);
+  }
+
+  generatePdf(){
+    // this tells the <Report /> to make a PDF
+    this.props.onGeneratePdf(this.state);
+  }
+
   render() {
     return (
       <div className='App-pages visualEditor'>
@@ -249,7 +255,7 @@ class VisualEditor extends React.Component {
           <ButtonGroup>
             <Button className='btn btn-sm btn-primary' onClick={this.addBox}>Add Box</Button>
             <Button>Set Margins</Button>
-            <Button>Generate PDF</Button>
+            <Button onClick={this.generatePdf}>Generate PDF</Button>
             <Button onClick={this.saveState}>Save Template</Button>
           </ButtonGroup>
         </div>
