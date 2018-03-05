@@ -15,12 +15,16 @@ class Report extends React.Component {
 
     this.state = {
       activeTab: '1',
-      updated: false
+      alert: {
+        active: false,
+        text: ''
+      }
     };
 
     this.toggleTab = this.toggleTab.bind(this);
     this.saveState = this.saveState.bind(this);
     this.generatePdf = this.generatePdf.bind(this);
+    this.updateAlert = this.updateAlert.bind(this);
   }
 
   toggleTab(tab) {
@@ -41,16 +45,18 @@ class Report extends React.Component {
     templates[this.props.match.params.id] = template;
     localStorage.setItem('templates', JSON.stringify(templates));
 
-    this.setState({updated: true});
+    this.updateAlert('Template updated');
+  }
+
+  updateAlert(text){
+    this.setState({alert: { active: true, text: text} });
 
     setTimeout(()=> {
-      this.setState({updated: false})
+      this.setState({alert: { active: false} })
     }, 2000);
   }
 
   generatePdf(state){
-    alert('making a PDF');
-
     // create a 'PDF' div that will be hidden from view and used to take a snapshot
     let printablePdf = document.createElement('div');
     printablePdf.id = 'printablePdf';
@@ -94,8 +100,9 @@ class Report extends React.Component {
       }
     }).then( response => response.json() )
     .then( response => {
-      console.log(response)
+      // console.log(response)
       window.location.href = `http://138.197.66.87/downloads/${response.filename}`;
+      this.updateAlert('PDF generated & downloaded');
     });
 
     printablePdf.parentNode.removeChild(printablePdf);
@@ -105,9 +112,9 @@ class Report extends React.Component {
     return (
       <div className='report'>
 
-        <Fade in={this.state.updated} className="mt-3">
+        <Fade in={this.state.alert.active} className="mt-3">
           <Alert color="primary">
-            Template saved
+            {this.state.alert.text}
           </Alert>
         </Fade>
 
