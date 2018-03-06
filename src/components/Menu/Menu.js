@@ -1,7 +1,7 @@
 import React from 'react';
 import './Menu.css';
 
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { Table, Button, Modal, ModalHeader, ModalBody, ModalFooter, Form, FormGroup, Input, Label } from 'reactstrap';
 
 class Home extends React.Component {
@@ -126,6 +126,10 @@ class Home extends React.Component {
             <Button color="dark" onClick={this.toggleModal}>Cancel</Button>
           </ModalFooter>
         </Modal>
+
+        <div className='footer'> 
+          <p>Need help? Check out the <Link to='/how-to'>"How To"</Link> page!</p>
+        </div>
 
       </div>
     );

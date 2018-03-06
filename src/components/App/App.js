@@ -3,9 +3,8 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import './App.css';
 
 import Menu from '../Menu/Menu';
-// import Visual from '../Visual/Visual';
 import Report from '../Report/Report';
-// import Code from '../Code/Code';
+import HowTo from '../HowTo/HowTo';
 
 class App extends React.Component {
   render() {
@@ -18,6 +17,7 @@ class App extends React.Component {
         <Router>
           <div className='App-pages'>
             <Route exact path="/" component={Menu} />
+            <Route path="/how-to" component={HowTo} />
             <Route path='/report/:name/:id' component={Report} />
           </div>
         </Router>
