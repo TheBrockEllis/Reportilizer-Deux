@@ -16,9 +16,9 @@ class App extends React.Component {
         </header>
         <Router>
           <div className='App-pages'>
-            <Route exact path="/" component={Menu} />
-            <Route path="/how-to" component={HowTo} />
-            <Route path='/report/:name/:id' component={Report} />
+            <Route exact path={process.env.PUBLIC_URL + '/'} component={Menu} />
+            <Route path={process.env.PUBLIC_URL + '/how-to'} component={HowTo} />
+            <Route path={process.env.PUBLIC_URL + '/report/:name/:id'} component={Report} />
           </div>
         </Router>
       </div>
