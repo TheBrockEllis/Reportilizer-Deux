@@ -11,3 +11,8 @@
   width: 100% !important;
   height: 200px !important;
 }
+
+.page-landscape {
+	min-height: 21.6cm;
+	width: 27.9cm;
+}

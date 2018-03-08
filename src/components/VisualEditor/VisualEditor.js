@@ -15,7 +15,8 @@ class VisualEditor extends React.Component {
       boxes: [],
       boxIndex: 0,
       editModal: false,
-      editBox: {}
+      editBox: {},
+      isLandscape: false
     };
 
     this.addBox = this.addBox.bind(this);
@@ -23,6 +24,7 @@ class VisualEditor extends React.Component {
     this.updateBox = this.updateBox.bind(this);
     this.saveState = this.saveState.bind(this);
     this.generatePdf = this.generatePdf.bind(this);
+    this.toggleOrientation = this.toggleOrientation.bind(this);
     this.toggleEditModal = this.toggleEditModal.bind(this);
     this.dragUpdateState = this.dragUpdateState.bind(this);
     this.resizeUpdateState = this.resizeUpdateState.bind(this);
@@ -35,7 +37,8 @@ class VisualEditor extends React.Component {
     if(templates[this.props.templateId]){
       this.setState({
         boxes: templates[this.props.templateId].boxes,
-        boxIndex: templates[this.props.templateId].boxes.length
+        boxIndex: templates[this.props.templateId].boxes.length,
+        isLandscape: templates[this.props.templateId].isLandscape
       });
     }
 
@@ -224,7 +227,7 @@ class VisualEditor extends React.Component {
   }
 
   updateBox(){
-    console.log('Updating box');
+    // console.log('Updating box');
 
     let updatedBox = {
       name: document.getElementById('boxName').value,
@@ -247,6 +250,12 @@ class VisualEditor extends React.Component {
     this.props.onGeneratePdf(this.state);
   }
 
+  toggleOrientation(){
+    this.setState({
+      isLandscape: !this.state.isLandscape
+    })
+  }
+
   render() {
     return (
       <div className='App-pages visualEditor'>
@@ -255,23 +264,26 @@ class VisualEditor extends React.Component {
           <ButtonGroup>
             <Button className='btn btn-sm btn-primary' onClick={this.addBox}>Add Box</Button>
             <Button>Set Margins</Button>
+            <Button onClick={this.toggleOrientation}>Toggle Orientation</Button>
             <Button onClick={this.generatePdf}>Generate PDF</Button>
             <Button onClick={this.saveState}>Save Template</Button>
           </ButtonGroup>
         </div>
         <div className='document'>
-          <div className='page' id='page1'>
+          <div className={'page ' + (this.state.isLandscape ? 'page-landscape' : '')} id='page1'>
+            <div className='page-inner'>
 
-          {
-            this.state.boxes.map( (box, index) => {
-                return <Box
-                  key={box.boxIndex}
-                  box={box}
-                  deleteBox={this.deleteBox}
-                  toggleEditModal={this.toggleEditModal} />
-            })
-          }
+              {
+                this.state.boxes.map( (box, index) => {
+                    return <Box
+                      key={box.boxIndex}
+                      box={box}
+                      deleteBox={this.deleteBox}
+                      toggleEditModal={this.toggleEditModal} />
+                })
+              }
 
+            </div>
           </div>
         </div>
 

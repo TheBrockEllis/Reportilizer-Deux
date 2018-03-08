@@ -41,6 +41,7 @@ class Report extends React.Component {
 
     template.updated = Math.floor(Date.now());
     template.boxes = state.boxes;
+    template.isLandscape = state.isLandscape;
 
     templates[this.props.match.params.id] = template;
     localStorage.setItem('templates', JSON.stringify(templates));
