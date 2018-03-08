@@ -19,6 +19,10 @@
 	padding-top: 2cm;
 	padding-right: 2cm;
 	padding-bottom: 2cm;
+
+
+  outline: 1px solid #ADD8E6;
+  outline-offset: -2cm;
 }
 /* Use CSS Paged Media to switch from continuous documents to sheet-like documents with separate pages */
 @page {

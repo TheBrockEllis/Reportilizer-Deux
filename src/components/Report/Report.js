@@ -1,6 +1,6 @@
 import React from 'react';
 import './Report.css';
-import '../../lib/paper/sheets-of-paper-a4.css';
+import '../../lib/paper/sheets-of-paper-usletter.css';
 import VisualEditor from '../VisualEditor/VisualEditor';
 import DataSource from '../DataSource/DataSource';
 
@@ -60,9 +60,10 @@ class Report extends React.Component {
     // create a 'PDF' div that will be hidden from view and used to take a snapshot
     let printablePdf = document.createElement('div');
     printablePdf.id = 'printablePdf';
-    printablePdf.style.width = '216mm';
-    printablePdf.style.height = '279mm';
+    printablePdf.style.width = '21cm';
+    printablePdf.style.minHeight = '29.7cm';
     printablePdf.style.fontSize = '3.52778mm';
+    printablePdf.style.padding = '2cm';
     printablePdf.style.margin = 0;
     printablePdf.style.position = 'relative';
     document.getElementsByTagName('body')[0].appendChild(printablePdf);
@@ -70,11 +71,11 @@ class Report extends React.Component {
     state.boxes.forEach(box => {
       let div = document.createElement('div');
       div.style.position = 'absolute';
-      div.style.left = (box.x / 3.779528)  + 'mm';
-      div.style.top = (box.y / 3.779528) + 'mm';
-      div.style.width = (box.width / 3.779528) + 'mm';
-      div.style.height = (box.height / 3.779528) + 'mm';
-      div.style.border = '1px solid #f1f1f1'; //remove this later
+      div.style.left = (box.x / 3.779528) * window.devicePixelRatio + 'mm';
+      div.style.top = (box.y / 3.779528) * window.devicePixelRatio + 'mm';
+      div.style.width = (box.width / 3.779528) * window.devicePixelRatio + 'mm';
+      div.style.height = (box.height / 3.779528) * window.devicePixelRatio + 'mm';
+      div.style.border = '1px solid #000'; //remove this later
 
       let templateFunction = dot.template(box.code);
       let html = templateFunction({}); // DATA SOURCE GOES HERE
@@ -119,7 +120,7 @@ class Report extends React.Component {
         </Fade>
 
         <Breadcrumb>
-          <BreadcrumbItem><a href="/">Main Menu</a></BreadcrumbItem>
+          <BreadcrumbItem><a href={process.env.PUBLIC_URL + '/'}>Main Menu</a></BreadcrumbItem>
           <BreadcrumbItem>{ this.props.match.params.name }</BreadcrumbItem>
           <BreadcrumbItem active>{ this.state.activeTab === '1' ? 'Visual Editor' : 'Data Source' }</BreadcrumbItem>
         </Breadcrumb>
