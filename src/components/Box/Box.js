@@ -35,7 +35,7 @@ class Box extends React.Component {
 
   render(){
     return (
-      <div className='draggable box' id={`box_${this.props.box.boxIndex}`} data-boxindex={this.props.box.boxIndex} style={ {width: this.props.box.width, height: this.props.box.height, transform: 'translate(' + this.props.box.x + 'px, ' + this.props.box.y + 'px)' } }>
+      <div className='draggable box' id={`box_${this.props.box.boxIndex}`} data-boxindex={this.props.box.boxIndex} data-x={this.props.box.x} data-y={this.props.box.y} style={ {width: this.props.box.width, height: this.props.box.height, transform: 'translate(' + this.props.box.x + 'px, ' + this.props.box.y + 'px)' } }>
         <p className='currentLocation'>{this.props.box.width} x {this.props.box.height}</p>
         <p className='boxTitle'>{this.props.box.name}</p>
         <div className='boxControls'>

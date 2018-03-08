@@ -47,7 +47,7 @@ class VisualEditor extends React.Component {
       restrict: {
         restriction: "parent",
         endOnly: true,
-        elementRect: { top: 0, left: 0, bottom: 1, right: 1 }
+        elementRect: { top: 1, left: 1, bottom: 1, right: 1 }
       },
       /* snap to a grid */
       snap: {
