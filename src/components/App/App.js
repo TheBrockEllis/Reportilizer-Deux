@@ -12,7 +12,7 @@ class App extends React.Component {
       <div className="App">
         <header className="App-header">
           <img src='https://fillmurray.com/50/50' alt='Reportilizer Logo' />
-          <a href='/'><h1>Reportilizer</h1></a>
+          <a href={process.env.PUBLIC_URL + '/'}><h1>Reportilizer</h1></a>
         </header>
         <Router>
           <div className='App-pages'>

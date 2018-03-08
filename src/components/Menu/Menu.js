@@ -127,8 +127,8 @@ class Home extends React.Component {
           </ModalFooter>
         </Modal>
 
-        <div className='footer'> 
-          <p>Need help? Check out the <Link to='/how-to'>"How To"</Link> page!</p>
+        <div className='footer'>
+          <p>Need help? Check out the <Link to={process.env.PUBLIC_URL + '/how-to'}>"How To"</Link> page!</p>
         </div>
 
       </div>
