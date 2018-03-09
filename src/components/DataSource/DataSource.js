@@ -3,8 +3,6 @@ import './DataSource.css';
 
 import Behave from 'behave-js';
 
-import { fixture_data } from '../../lib/fixture-data';
-
 class DataSource extends React.Component {
 
   componentDidMount(){
@@ -12,9 +10,6 @@ class DataSource extends React.Component {
     new Behave({
       textarea: textarea
     });
-
-    textarea.value = JSON.stringify(fixture_data, null, 2);
-
   }
 
   render() {
