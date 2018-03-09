@@ -58,11 +58,20 @@ class Report extends React.Component {
   }
 
   generatePdf(state){
+    console.log(state);
+
     // create a 'PDF' div that will be hidden from view and used to take a snapshot
     let printablePdf = document.createElement('div');
     printablePdf.id = 'printablePdf';
-    printablePdf.style.width = '21cm';
-    printablePdf.style.minHeight = '29.7cm';
+
+    if(state.isLandscape){
+      printablePdf.style.width = '29.7cm';
+      printablePdf.style.minHeight = '21cm';
+    } else {
+      printablePdf.style.width = '21cm';
+      printablePdf.style.minHeight = '29.7cm';
+    }
+
     printablePdf.style.fontSize = '3.52778mm';
     printablePdf.style.padding = '2cm';
     printablePdf.style.margin = 0;
@@ -76,7 +85,7 @@ class Report extends React.Component {
       div.style.top = (box.y / 3.779528) * window.devicePixelRatio + 'mm';
       div.style.width = (box.width / 3.779528) * window.devicePixelRatio + 'mm';
       div.style.height = (box.height / 3.779528) * window.devicePixelRatio + 'mm';
-      div.style.border = '1px solid #000'; //remove this later
+      if(state.isDebugging) div.style.border = '1px solid #000'; //remove this later
 
       let templateFunction = dot.template(box.code);
       let html = templateFunction({}); // DATA SOURCE GOES HERE
@@ -92,9 +101,21 @@ class Report extends React.Component {
     });
 
     // send HTTP POST request to server with HTML string to generate a PDF
+    let data = {
+      "content": printablePdf.outerHTML,
+      "orientation": state.isLandscape ? 'landscape' : 'portrait',
+      "margins": {
+        "left": "2cm",
+        "right": "2cm",
+        "bottom": "2cm",
+        "top": "2cm"
+      },
+      "name": this.props.match.params.name
+    }
+
     fetch('http://138.197.66.87', {
     	method: 'POST',
-      body: printablePdf.outerHTML,
+      body: JSON.stringify(data),
     	mode: 'cors',
       headers: {
         'Accept': 'application/json',
@@ -103,7 +124,8 @@ class Report extends React.Component {
     }).then( response => response.json() )
     .then( response => {
       // console.log(response)
-      window.location.href = `http://138.197.66.87/downloads/${response.filename}`;
+      let iframe = document.getElementById('downloadFrame');
+      iframe.src = `http://138.197.66.87/download.php?filename=${response.filename}`;
       this.updateAlert('PDF generated & downloaded');
     });
 
@@ -125,6 +147,8 @@ class Report extends React.Component {
           <BreadcrumbItem>{ this.props.match.params.name }</BreadcrumbItem>
           <BreadcrumbItem active>{ this.state.activeTab === '1' ? 'Visual Editor' : 'Data Source' }</BreadcrumbItem>
         </Breadcrumb>
+
+        <iframe title='Download iFrame' id='downloadFrame' src=''></iframe>
 
         <Nav tabs>
           <NavItem>

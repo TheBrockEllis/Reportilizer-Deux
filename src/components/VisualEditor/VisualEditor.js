@@ -16,7 +16,8 @@ class VisualEditor extends React.Component {
       boxIndex: 0,
       editModal: false,
       editBox: {},
-      isLandscape: false
+      isLandscape: false,
+      isDebugging: false
     };
 
     this.addBox = this.addBox.bind(this);
@@ -38,7 +39,8 @@ class VisualEditor extends React.Component {
       this.setState({
         boxes: templates[this.props.templateId].boxes,
         boxIndex: templates[this.props.templateId].boxes.length,
-        isLandscape: templates[this.props.templateId].isLandscape
+        isLandscape: templates[this.props.templateId].isLandscape,
+        isDebugging: templates[this.props.templateId].isDebugging
       });
     }
 
@@ -50,7 +52,7 @@ class VisualEditor extends React.Component {
       restrict: {
         restriction: "parent",
         endOnly: true,
-        elementRect: { top: 1, left: 1, bottom: 1, right: 1 }
+        elementRect: { top: 1, left: 1, bottom: 0, right: 0 }
       },
       /* snap to a grid */
       snap: {
@@ -183,7 +185,7 @@ class VisualEditor extends React.Component {
   addBox(){
     // State change will cause component re-render
     let box = {
-      boxIndex: this.state.boxIndex,
+      boxIndex: this.state.boxes.length || 0,
       name: `Box #${this.state.boxIndex}`,
       x: 0,
       y: 0,
@@ -262,7 +264,8 @@ class VisualEditor extends React.Component {
 
         <div className='templateControls'>
           <ButtonGroup>
-            <Button className='btn btn-sm btn-primary' onClick={this.addBox}>Add Box</Button>
+            <Button onClick={() => this.setState({isDebugging: !this.state.isDebugging})} active={this.state.isDebugging}>Debug</Button>
+            <Button onClick={this.addBox}>Add Box</Button>
             <Button>Set Margins</Button>
             <Button onClick={this.toggleOrientation}>Toggle Orientation</Button>
             <Button onClick={this.generatePdf}>Generate PDF</Button>
@@ -271,19 +274,17 @@ class VisualEditor extends React.Component {
         </div>
         <div className='document'>
           <div className={'page ' + (this.state.isLandscape ? 'page-landscape' : '')} id='page1'>
-            <div className='page-inner'>
 
-              {
-                this.state.boxes.map( (box, index) => {
-                    return <Box
-                      key={box.boxIndex}
-                      box={box}
-                      deleteBox={this.deleteBox}
-                      toggleEditModal={this.toggleEditModal} />
-                })
-              }
+            {
+              this.state.boxes.map( (box, index) => {
+                  return <Box
+                    key={box.boxIndex}
+                    box={box}
+                    deleteBox={this.deleteBox}
+                    toggleEditModal={this.toggleEditModal} />
+              })
+            }
 
-            </div>
           </div>
         </div>
 

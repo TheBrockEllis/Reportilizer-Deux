@@ -4,3 +4,8 @@
   right: 10px;
   margin-bottom: 0 !important;
 }
+
+
+.report iframe {
+  display: none;
+}
