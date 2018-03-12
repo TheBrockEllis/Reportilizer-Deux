@@ -98,7 +98,7 @@ class Report extends React.Component {
       if(state.isDebugging) div.style.border = '1px solid #000'; //remove this later
 
       let templateFunction = dot.template(box.code);
-      let html = templateFunction({}); // DATA SOURCE GOES HERE
+      let html = templateFunction(box.data);
 
       // inline all of the CSS styles we have
       html = juice.inlineContent(html, box.style, { inlinePseudoElements: true });
