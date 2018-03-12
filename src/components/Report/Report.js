@@ -18,10 +18,12 @@ class Report extends React.Component {
       alert: {
         active: false,
         text: ''
-      }
+      },
+      template: '',
     };
 
     this.toggleTab = this.toggleTab.bind(this);
+    this.initTemplate = this.initTemplate.bind(this);
     this.saveState = this.saveState.bind(this);
     this.saveSourceData = this.saveSourceData.bind(this);
     this.generatePdf = this.generatePdf.bind(this);
@@ -34,6 +36,15 @@ class Report extends React.Component {
         activeTab: tab
       });
     }
+  }
+
+  componentDidMount(){
+    this.initTemplate();
+  }
+
+  initTemplate(){
+    let templates = JSON.parse(localStorage.getItem('templates'));
+    this.setState({ template: templates[this.props.match.params.id] });
   }
 
   saveState(state){
@@ -70,6 +81,9 @@ class Report extends React.Component {
   }
 
   generatePdf(state){
+    // load the latest template data from localStorage
+    this.initTemplate();
+
     // create a 'PDF' div that will be hidden from view and used to take a snapshot
     let printablePdf = document.createElement('div');
     printablePdf.id = 'printablePdf';
@@ -98,7 +112,7 @@ class Report extends React.Component {
       if(state.isDebugging) div.style.border = '1px solid #000'; //remove this later
 
       let templateFunction = dot.template(box.code);
-      let html = templateFunction(box.data);
+      let html = templateFunction(JSON.parse(this.state.template.data));
 
       // inline all of the CSS styles we have
       html = juice.inlineContent(html, box.style, { inlinePseudoElements: true });

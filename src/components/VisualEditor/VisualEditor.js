@@ -225,7 +225,9 @@ class VisualEditor extends React.Component {
     boxes.splice(arrayIndex, 1);
     this.setState({
       boxes: boxes
-    })
+    });
+
+    // TODO: since we deleted a box from the array, we need to reindex boxes here
   }
 
   updateBox(){
