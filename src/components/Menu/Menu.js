@@ -51,6 +51,7 @@ class Home extends React.Component {
       name: templateName,
       margins: [],
       boxes: [],
+      data: '',
       updated: Math.floor(Date.now())
     }
 

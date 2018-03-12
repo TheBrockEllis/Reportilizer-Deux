@@ -23,6 +23,7 @@ class Report extends React.Component {
 
     this.toggleTab = this.toggleTab.bind(this);
     this.saveState = this.saveState.bind(this);
+    this.saveSourceData = this.saveSourceData.bind(this);
     this.generatePdf = this.generatePdf.bind(this);
     this.updateAlert = this.updateAlert.bind(this);
   }
@@ -49,6 +50,17 @@ class Report extends React.Component {
     this.updateAlert('Template updated');
   }
 
+  saveSourceData(data){
+    //load template data from localStorage
+    let templates = JSON.parse(localStorage.getItem('templates'));
+    if(templates[this.props.match.params.id]){
+      templates[this.props.match.params.id].data = data;
+    }
+
+    localStorage.setItem('templates', JSON.stringify(templates));
+    this.updateAlert('Source data updated');
+  }
+
   updateAlert(text){
     this.setState({alert: { active: true, text: text} });
 
@@ -58,8 +70,6 @@ class Report extends React.Component {
   }
 
   generatePdf(state){
-    console.log(state);
-
     // create a 'PDF' div that will be hidden from view and used to take a snapshot
     let printablePdf = document.createElement('div');
     printablePdf.id = 'printablePdf';
@@ -173,7 +183,7 @@ class Report extends React.Component {
             <VisualEditor templateId={this.props.match.params.id} onSaveState={this.saveState} onGeneratePdf={this.generatePdf}/>
           </TabPane>
           <TabPane tabId="2">
-            <DataSource />
+            <DataSource templateId={this.props.match.params.id} saveSourceData={this.saveSourceData} />
           </TabPane>
         </TabContent>
       </div>
