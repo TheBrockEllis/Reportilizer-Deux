@@ -14,6 +14,8 @@ class Report extends React.Component {
     super(props);
 
     this.state = {
+      //url: "http://138.197.66.87",
+      url: "http://localhost",
       activeTab: '1',
       alert: {
         active: false,
@@ -112,7 +114,7 @@ class Report extends React.Component {
       if(state.isDebugging) div.style.border = '1px solid #000'; //remove this later
 
       let templateFunction = dot.template(box.code);
-      let html = templateFunction(JSON.parse(this.state.template.data));
+      let html = this.state.template.data ? templateFunction(JSON.parse(this.state.template.data)) : '' ;
 
       // inline all of the CSS styles we have
       html = juice.inlineContent(html, box.style, { inlinePseudoElements: true });
@@ -137,7 +139,7 @@ class Report extends React.Component {
       "name": this.props.match.params.name
     }
 
-    fetch('http://138.197.66.87', {
+    fetch(this.state.url, {
     	method: 'POST',
       body: JSON.stringify(data),
     	mode: 'cors',
@@ -149,7 +151,7 @@ class Report extends React.Component {
     .then( response => {
       // console.log(response)
       let iframe = document.getElementById('downloadFrame');
-      iframe.src = `http://138.197.66.87/download.php?filename=${response.filename}`;
+      iframe.src = `${this.state.url}/download.php?filename=${response.filename}`;
       this.updateAlert('PDF generated & downloaded');
     });
 
