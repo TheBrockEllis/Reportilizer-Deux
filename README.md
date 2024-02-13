@@ -1,3 +1,6 @@
+
+<img width="1185" alt="Screenshot 2024-02-13 at 11 32 27 AM" src="https://github.com/TheBrockEllis/Reportilizer-Deux/assets/1606194/1c458faf-6cc7-4d47-82ec-30e9598e976f">
+
 ## docker-compose
 Note that all `docker-compose` commands rely on the `docker-compose.yml` file and can only be run from the root directory of this repository.
 
